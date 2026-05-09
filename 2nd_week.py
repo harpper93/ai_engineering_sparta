@@ -32,6 +32,7 @@ def get_current_prices_api(tickers):
     markets_param = ",".join(tickers)
     params = {"markets": markets_param}
 
+    print(f">>>>>>>>>>> prameters: {params}")  # API 요청에 사용되는 파라미터 출력
     # API 요청
     response = requests.get(url, headers=headers, params=params)
     prices_data = response.json()
