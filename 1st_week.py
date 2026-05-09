@@ -43,46 +43,99 @@ portfolio = {
     "KRW-XRP"   : 1000
    # ,"KRW-SOL"   : 10
 }
-def analyze_portfolio(portfolio) : 
-    tickers = list(portfolio.keys())
-    #print('tickers => ',tickers)
-    #1.현재가 조회
-    prices = get_current_prices_api(tickers)
-    print(f'prices ==> {prices}')
-    #2.각 암호화폐별 분석  
-    # - 현재가 × 보유 수량 → 개별 가치 계산
-    # - `portfolio_analysis` 리스트에 코인명, 수량, 현재가, 가치 저장
-    # - 동시에 `total_value`(총합)를 누적
+# def analyze_portfolio(portfolio) : 
+#     tickers = list(portfolio.keys())
+#     #print('tickers => ',tickers)
+#     #1.현재가 조회
+#     prices = get_current_prices_api(tickers)
+#     print(f'prices ==> {prices}')
+#     #2.각 암호화폐별 분석  
+#     # - 현재가 × 보유 수량 → 개별 가치 계산
+#     # - `portfolio_analysis` 리스트에 코인명, 수량, 현재가, 가치 저장
+#     # - 동시에 `total_value`(총합)를 누적
     
 
-    portfolio_analysis  = []
-    total_value         = 0 
+#     portfolio_analysis  = []
+#     total_value         = 0 
 
-    for ticker, quantity in portfolio.items():
-        if ticker in prices:
-            current_price = prices[ticker]
-            value = current_price * quantity #현재가 × 보유 수량 → 개별 가치 계산
-            total_value += value #총합 누적
-            portfolio_analysis.append({
-                "코인": ticker.split('-')[1],  # 'KRW-BTC' -> 'BTC' 
-                "수량": quantity,
-                "현재가": current_price,
-                "가치": value
-            })
-    #3.비중계산
-    for item in portfolio_analysis:
-        item['비중'] = (item['가치'] / total_value) * 100 
+#     for ticker, quantity in portfolio.items():
+#         if ticker in prices:
+#             current_price = prices[ticker]
+#             value = current_price * quantity #현재가 × 보유 수량 → 개별 가치 계산
+#             total_value += value #총합 누적
+#             portfolio_analysis.append({
+#                 "코인": ticker.split('-')[1],  # 'KRW-BTC' -> 'BTC' 
+#                 "수량": quantity,
+#                 "현재가": current_price,
+#                 "가치": value
+#             })
+#     #3.비중계산
+#     for item in portfolio_analysis:
+#         item['비중'] = (item['가치'] / total_value) * 100 
     
-    # print("="*80)
-    # print("포트폴리오 분석 결과")
-    # print("="*80)
-    # print(f"\n총 포트폴리오 가치: {total_value:,.0f}원\n")
-    # print("-"*80)
-    # print(f"{'코인':^10} {'수량':>15} {'현재가':>18} {'가치':>18} {'비중':>12}")
-    # print("-"*80)
+#     # print("="*80)
+#     # print("포트폴리오 분석 결과")
+#     # print("="*80)
+#     # print(f"\n총 포트폴리오 가치: {total_value:,.0f}원\n")
+#     # print("-"*80)
+#     # print(f"{'코인':^10} {'수량':>15} {'현재가':>18} {'가치':>18} {'비중':>12}")
+#     # print("-"*80)
 
-    return portfolio_analysis
+#     return portfolio_analysis
 
-print('analyze_portfolio >> ', analyze_portfolio(portfolio))
+
+def analyze_portfolio(portfolio):
+
+    # 1. 현재가 조회
+   tickers = list(portfolio.keys())
+  #  print(f"tickers : {tickers}")
+   prices = get_current_prices_api(tickers)
+  #  print(f" prices : {prices}")
+   portfolio_analysis = []
+   total_value = 0
+
+   for ticker, quantity in portfolio.items():
+      # print(f"ticker : {ticker}, quantity : {quantity}")
+      current_price = prices.get(ticker, 0 )
+      # print(f"current_price : {current_price}")
+
+      value = current_price * quantity
+      # print(f"value : {value}")
+
+      coin_name = ticker.split("-")[1]
+      # print(f"coin_name : {coin_name}")
+
+      portfolio_analysis.append({
+          "코인" : coin_name,
+          "수량" : quantity,
+          "현재가" : current_price,
+          "가치" : value
+      })
+
+      total_value += value
+    # 각 코인 정보 출력
+   for item in portfolio_analysis:
+      item["비중"] = (item["가치"] / total_value) * 100
+
+   print("="*80)
+   print("포트폴리오 분석 결과")
+   print("="*80)
+   print(f"\n총 포트폴리오 가치: {total_value:,.0f}원\n")
+   print("-"*80)
+   print(f"{'코인':^10} {'수량':>15} {'현재가':>18} {'가치':>18} {'비중':>12}")
+   print("-"*80)
+
+   for item in portfolio_analysis:
+    coin = item["코인"]
+    quantity = item["수량"]
+    price = item["현재가"]
+    value = item["가치"]
+    ratio = item["비중"]
+
+    return print(f"{coin:^10} {quantity:>15.4f} {price:>18,} {value:>18,.0f} {ratio:>11.2f}%")
+
+analyze_portfolio(portfolio)
+#print('analyze_portfolio >> ', analyze_portfolio(portfolio))
+
 
 
