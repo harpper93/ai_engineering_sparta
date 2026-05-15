@@ -32,7 +32,7 @@ def get_current_prices_api(tickers):
     markets_param = ",".join(tickers)
     params = {"markets": markets_param}
 
-    print(f">>>>>>>>>>> prameters: {params}")  # API 요청에 사용되는 파라미터 출력
+    print(f">>>>>>>>>>>prameters: {params}")  # API 요청에 사용되는 파라미터 출력
     # API 요청
     response = requests.get(url, headers=headers, params=params)
     prices_data = response.json()
@@ -44,8 +44,8 @@ def get_current_prices_api(tickers):
 
     return prices
 
-print(get_current_prices_api(["KRW-BTC"]))
-pyupbit.get_current_price(["KRW-BTC"])
+print(get_current_prices_api(["KRW-BTC"]))  #조회할 티커 리스트 전달
+pyupbit.get_current_price(["KRW-BTC"])      #pyupbit 라이브러리를 사용하여 현재가 조회
 
 class UpbitDataCollector:
     """Upbit API를 활용한 데이터 수집 클래스"""
@@ -56,7 +56,7 @@ class UpbitDataCollector:
     def get_krw_tickers(self):
         """KRW 마켓의 모든 티커 조회"""
         try:
-            tickers = pyupbit.get_tickers(fiat="KRW")
+            tickers = pyupbit.get_tickers(fiat="KRW")  #업비트에서 거래 가능한 코인 목록 가져오기 -> KRW 마켓의 티커만 조회
             self.supported_tickers = tickers
             return tickers
         except Exception as e:
@@ -77,7 +77,7 @@ class UpbitDataCollector:
     def get_ohlcv_data(self, ticker, interval="day", count=30):
         """OHLCV 데이터 조회"""
         try:
-            df = pyupbit.get_ohlcv(ticker, interval=interval, count=count)
+            df = pyupbit.get_ohlcv(ticker, interval=interval, count=count) #업비트에서 OHLCV 데이터 조회 -> ticker: 조회할 암호화폐 티커, interval: 데이터 간격 (day, minute 등), count: 조회할 데이터 개수
             if df is not None:
                 df['ticker'] = ticker
                 df.reset_index(inplace=True)
@@ -103,12 +103,14 @@ class UpbitDataCollector:
         return pd.DataFrame()
 
 # 클래스 인스턴스 생성
-collector = UpbitDataCollector()
+collector = UpbitDataCollector() #업비트 데이터 수집기 인스턴스 생성 
+
+#print("UpbitDataCollector.get_krw_tickers() 결과:",collector.get_krw_tickers()) #KRW 마켓의 모든 티커 조회 결과 출력
 
 # 1. str  "122220000"
 # 2. dict {"KRW-BTC":"12002222"}
-print(collector.get_current_prices("KRW-BTC"))
-print(collector.get_current_prices(["KRW-BTC", "KRW-ETH"])) 
+print("1.upbit 에서 데이터 출력 [KRW-BTC] -----> ",collector.get_current_prices("KRW-BTC"))
+print("2upbit 에서 데이터 출력 [KRW-BTC, KRW-ETH] -----> ",collector.get_current_prices(["KRW-BTC", "KRW-ETH"]))
 
 major_tickers = "KRW-BTC" #["KRW-BTC","KRW-ETC","KRW-XRP"]
 
@@ -135,7 +137,7 @@ def collect_market_data():
         count=30
     )
 
-    print(raw_data.head())
+    print("raw_data [head] ======= ",raw_data.head())
     print("\n데이터 개수:", len(raw_data))
 
     return current_prices, raw_data
@@ -247,5 +249,5 @@ processed_data = preprocess_data(raw_data)
 print("============ df 확인 =============")
 print(df)
 
-#processed_data.to_csv("processed_market_data.csv", index=False, encoding="utf-8-sig")
-#print("============= CSV 저장 완료 ======== ")
+processed_data.to_csv("processed_market_data.csv", index=False, encoding="utf-8-sig")
+print("============= CSV 저장 완료 ======== ")
