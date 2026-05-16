@@ -116,6 +116,7 @@ def analyze_portfolio(portfolio):
     # 각 코인 정보 출력
    for item in portfolio_analysis:
       item["비중"] = (item["가치"] / total_value) * 100
+      return print('item ==> ',item)
 
    print("="*80)
    print("포트폴리오 분석 결과")
@@ -131,11 +132,51 @@ def analyze_portfolio(portfolio):
     price = item["현재가"]
     value = item["가치"]
     ratio = item["비중"]
-
-    return print(f"{coin:^10} {quantity:>15.4f} {price:>18,} {value:>18,.0f} {ratio:>11.2f}%")
+    print(f"{coin:^10} {quantity:>15.4f} {price:>18,} {value:>18,.0f} {ratio:>11.2f}%")
+   return portfolio_analysis
 
 analyze_portfolio(portfolio)
 #print('analyze_portfolio >> ', analyze_portfolio(portfolio))
 
 
+#목표가 설정 (상한가 / 하한가)
+target_prices = {
+    "KRW-BTC": {"upper": 100000000, "lower": 90000000},
+    "KRW-ETH": {"upper": 5000000,   "lower": 3000000},
+    "KRW-XRP": {"upper": 1000,      "lower": 500}
+}
 
+#모니터링 
+def monitor_prices(portfolio, target_prices):
+
+    tickers = list(portfolio.keys())
+
+    while True:
+        print("\n[가격 모니터링 중...] ", datetime.now())
+
+        prices = get_current_prices_api(tickers)
+
+        for ticker in tickers:
+            current_price = prices.get(ticker, 0)
+            targets = target_prices.get(ticker, {})
+
+            upper = targets.get("upper")
+            lower = targets.get("lower")
+
+            coin = ticker.split("-")[1]
+
+            # ✅ 상한가 도달
+            if upper and current_price >= upper:
+                print(f"[🚀 SELL SIGNAL] {coin} 목표 상한가 도달!")
+                print(f"현재가: {current_price:,} / 목표가: {upper:,}")
+
+            # ✅ 하한가 도달
+            elif lower and current_price <= lower:
+                print(f"[📉 BUY SIGNAL] {coin} 목표 하한가 도달!")
+                print(f"현재가: {current_price:,} / 목표가: {lower:,}")
+
+        # 5초마다 반복
+        time.sleep(5)
+
+#모니터링 실행
+monitor_prices(portfolio, target_prices)
